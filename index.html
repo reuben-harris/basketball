@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Basketball Hoops</title>
+  <style>
+    /* Reset + prevent scrolling */
+    html,body { height:100%; margin:0; padding:0; overflow:hidden; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; }
+
+    /* Fullscreen video background */
+    .video-bg { position:fixed; inset:0; z-index:0; overflow:hidden; }
+    .video-bg video { width:100%; height:100%; object-fit:cover; display:block; }
+
+    /* Top header */
+    header { position:fixed; top:20px; left:0; right:0; z-index:3; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+    header h1 { margin:0; padding:10px 18px; background:rgba(0,0,0,0.35); color:white; border-radius:8px; font-size:clamp(18px,3vw,32px); pointer-events:auto; }
+
+    /* Center controls */
+    .controls { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:2; pointer-events:none; }
+    .controls .btn { pointer-events:auto; padding:12px 18px; font-size:16px; border-radius:8px; border:0; cursor:pointer; background:rgba(255,255,255,0.9); }
+
+    /* Simple modal / info bit */
+    .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:4; }
+    .modal { width:min(760px,94%); max-height:86vh; overflow:auto; background:white; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.4); padding:18px; transform:translateY(6px); }
+    .modal img { width:100%; height:auto; border-radius:8px; display:block; margin-bottom:12px; }
+    .modal .close { display:inline-block; margin-top:8px; padding:8px 12px; border-radius:8px; border:0; cursor:pointer; }
+
+    /* Blur when modal open */
+    .blur .video-bg video { filter:blur(6px) contrast(0.95) brightness(0.9); transform:scale(1.02); }
+
+    /* Show modal */
+    .modal-backdrop.open { display:flex; }
+
+    /* Small accessibility/focus styles */
+    .btn:focus, .close:focus { outline:3px solid rgba(0,123,255,0.25); }
+
+    /* Make sure everything is readable on small screens */
+    @media (max-width:480px){ header h1{ font-size:18px; padding:8px 12px } .btn{ font-size:15px; padding:10px 14px } }
+  </style>
+</head>
+<body>
+
+  <div class="video-bg" aria-hidden="true">
+    <video id="bgVideo" autoplay muted loop playsinline>
+      <source src="../basketball/hoops/paparangi-1/video1.mp4" type="video/mp4">
+      <!-- Fallback poster image -->
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <header>
+    <h1 id="hoop-name">Paparangi Playground Hoop</h1>
+  </header>
+
+  <div class="controls">
+    <button class="btn" id="infoBtn" aria-controls="infoModal" aria-expanded="false">Show info</button>
+  </div>
+
+  <!-- Modal / Info bit -->
+  <div class="modal-backdrop" id="infoModal" role="dialog" aria-modal="true" aria-labelledby="hoop-name">
+    <div class="modal" role="document">
+      <img src="../basketball/hoops/paparangi-1/image1.jpg" alt="Photo of the hoop">
+      <p><strong>Location:</strong> Riverside Park — near the main carpark.</p>
+      <p><strong>Description:</strong> Public outdoor basketball hoop with painted lines, one rim, concrete court. Open 24/7. Benches and lights nearby. Add more fields you track (lat/long, surface, condition, photos) as needed.</p>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+        <button class="close" id="closeBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const infoBtn = document.getElementById('infoBtn');
+    const modalBackdrop = document.getElementById('infoModal');
+    const closeBtn = document.getElementById('closeBtn');
+    const body = document.body;
+    const video = document.getElementById('bgVideo');
+
+    function openModal(){
+      modalBackdrop.classList.add('open');
+      body.classList.add('blur');
+      infoBtn.setAttribute('aria-expanded','true');
+      // move focus into modal for accessibility
+      closeBtn.focus();
+    }
+    function closeModal(){
+      modalBackdrop.classList.remove('open');
+      body.classList.remove('blur');
+      infoBtn.setAttribute('aria-expanded','false');
+      infoBtn.focus();
+    }
+
+    infoBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    modalBackdrop.addEventListener('click', (e)=>{
+      if(e.target === modalBackdrop) closeModal();
+    });
+
+    // allow Esc to close
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && modalBackdrop.classList.contains('open')) closeModal(); });
+
+    // Prevent video controls or context menu from interfering
+    video.addEventListener('contextmenu', e => e.preventDefault());
+  </script>
+</body>
+</html>
